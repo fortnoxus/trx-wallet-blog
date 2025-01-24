@@ -1,38 +1,118 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Getting Started with TRX Wallet App | TRX Wallet Blog</title>
-    <meta name="description" content="Learn how to set up and start using the TRX Wallet App with this step-by-step guide.">
-    <link rel="stylesheet" href="/assets/css/styles.css">
-</head>
-<body>
-    <header>
-        <h1>Getting Started with TRX Wallet App</h1>
-        <nav>
-    <ul>
-        <li><a href="/trx-wallet-blog/">Home</a></li>
-        <li><a href="/trx-wallet-blog/articles/article1.html">Articles</a></li>
-        <li><a href="/trx-wallet-blog/program/">App</a></li>
-        <li><a href="/trx-wallet-blog/contacts/">Contact</a></li>
-    </ul>
-</nav>
-    </header>
-    <main>
-        <section>
-            <h2>Step-by-Step Guide</h2>
-            <p>Here’s how you can set up and start using the TRX Wallet App:</p>
-            <ol>
-                <li>Download the app from the <a href="/program/">App page</a>.</li>
-                <li>Install the app on your device.</li>
-                <li>Create a new wallet or import an existing one.</li>
-                <li>Start managing your TRX tokens effortlessly.</li>
-            </ol>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2023 TRX Wallet App. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 20px;
+}
+
+/* Header */
+.article-header {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: #fff;
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.article-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.article-header nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.article-header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.article-header nav ul li a:hover {
+    color: #f1c40f;
+}
+
+/* Main Content */
+.article-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.article-content section {
+    background: #2c3e50;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.article-content h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #f1c40f;
+}
+
+.article-content p {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    line-height: 1.8;
+}
+
+.article-content ul {
+    list-style: none;
+    padding-left: 20px;
+}
+
+.article-content ul li {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.article-content ul li strong {
+    color: #f1c40f;
+}
+
+/* Footer */
+.article-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    background: #2c3e50;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.article-footer p {
+    font-size: 1rem;
+    color: #fff;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.article-content section {
+    animation: fadeIn 0.8s ease-out;
+}
