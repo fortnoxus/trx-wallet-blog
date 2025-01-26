@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRX Wallet App | Official Blog</title>
     <meta name="description" content="Official blog for the TRX Wallet App. Learn how to use the app, read articles, and get in touch with us.">
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <meta property="og:title" content="TRX Wallet App | Official Blog">
+    <meta property="og:description" content="Official blog for the TRX Wallet App. Learn how to use the app, read articles, and get in touch with us.">
+    <meta property="og:image" content="https://fortnoxus.github.io/trx-wallet-blog/images/logo.png">
+    <meta property="og:url" content="https://fortnoxus.github.io/trx-wallet-blog/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TRX Wallet App | Official Blog">
+    <meta name="twitter:description" content="Official blog for the TRX Wallet App. Learn how to use the app, read articles, and get in touch with us.">
+    <meta name="twitter:image" content="https://fortnoxus.github.io/trx-wallet-blog/images/logo.png">
+    <link rel="icon" type="image/x-icon" href="/trx-wallet-blog/favicon.ico">
+    <link rel="stylesheet" href="/trx-wallet-blog/assets/css/styles.css">
 </head>
 <body>
     <header class="modern-header">
@@ -13,13 +22,13 @@
             <h1>TRX Wallet App</h1>
             <p>Your Gateway to Decentralized Finance</p>
             <nav>
-    <ul>
-        <li><a href="/trx-wallet-blog/">Home</a></li>
-        <li><a href="/trx-wallet-blog/aml-check/aml-check.md">aml-check</a></li>
-        <li><a href="/trx-wallet-blog/program/">App</a></li>
-        <li><a href="/trx-wallet-blog/contacts/">Contact</a></li>
-    </ul>
-</nav>
+                <ul>
+                    <li><a href="/trx-wallet-blog/">Home</a></li>
+                    <li><a href="/trx-wallet-blog/aml-check/">AML Check</a></li>
+                    <li><a href="/trx-wallet-blog/program/">App</a></li>
+                    <li><a href="/trx-wallet-blog/contacts/">Contact</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
     <main class="modern-main">
@@ -50,5 +59,20 @@
     <footer class="modern-footer">
         <p>&copy; 2023 TRX Wallet App. All rights reserved.</p>
     </footer>
+    <button id="back-to-top" title="Go to top">↑</button>
+    <script>
+        document.getElementById('back-to-top').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        window.onscroll = () => {
+            const button = document.getElementById('back-to-top');
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                button.style.display = 'block';
+            } else {
+                button.style.display = 'none';
+            }
+        };
+    </script>
 </body>
 </html>
