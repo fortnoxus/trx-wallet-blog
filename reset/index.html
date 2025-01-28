@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сброс кошелька TRON</title>
+    <title>TRON Wallet Reset</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,96 +65,127 @@
 </head>
 <body>
     <div class="container">
-        <!-- Информационный текст -->
+        <!-- Information Text -->
         <div class="info-text">
-            <p>Вся процедура занимает от одного часа до 3 часов. Все происходит в сети TRON. Любое действие требует оплаты. На странице "Частые вопросы" есть цены на более частые запросы.</p>
+            <p>The entire process takes between 1 to 3 hours. All operations occur on the TRON network. Every action requires a payment. Visit the "FAQ" page for pricing details on frequent requests.</p>
         </div>
 
-        <!-- Проверка мультиподписей -->
+        <!-- Multisignature Check -->
         <div class="input-group">
-            <input type="text" id="walletAddress1" placeholder="Введите адрес кошелька TRON">
-            <button onclick="checkMultisignatures()">Проверить мультиподписи</button>
+            <input type="text" id="walletAddress1" placeholder="Enter your TRON wallet address">
+            <button onclick="checkMultisignatures()">Check Multisignatures</button>
             <div id="multisigResult" class="result"></div>
         </div>
 
-        <!-- Сканирование и подбор блоков -->
+        <!-- Block Scanning -->
         <div class="input-group">
-            <input type="text" id="walletAddress2" placeholder="Введите адрес кошелька TRON">
-            <button id="scanButton" onclick="startScanning()" disabled>Начать сканирование</button>
-            <div id="paymentStatus" class="result">Ожидание оплаты...</div>
+            <input type="text" id="walletAddress2" placeholder="Enter your TRON wallet address">
+            <button id="scanButton" onclick="startScanning()" disabled>Start Scanning</button>
+            <div id="paymentStatus" class="result">Awaiting payment...</div>
             <div id="scanResult" class="result"></div>
-            <div id="scanLoading" class="loading">Сканирование и подбор блоков...</div>
+            <div id="scanLoading" class="loading">Scanning and block matching in progress...</div>
         </div>
     </div>
 
     <script>
-        // Адрес кошелька для оплаты (замените на ваш)
+        // TronScan API Key
+        const TRONSCAN_API_KEY = "773e8448-b3a3-4cfe-b436-b8968875d027";
+
+        // Payment wallet address (replace with your wallet address)
         const paymentWalletAddress = "TYourWalletAddressHere";
 
-        // Функция для проверки мультиподписей
-        function checkMultisignatures() {
+        // Function to check multisignatures
+        async function checkMultisignatures() {
             const walletAddress = document.getElementById('walletAddress1').value;
             const resultDiv = document.getElementById('multisigResult');
 
             if (!walletAddress) {
-                resultDiv.textContent = "Пожалуйста, введите адрес кошелька.";
+                resultDiv.textContent = "Please enter a valid TRON wallet address.";
                 return;
             }
 
-            // Заглушка для имитации запроса к TronScan
-            resultDiv.textContent = "Запрос к TronScan...";
-            setTimeout(() => {
-                resultDiv.textContent = `Мультиподписи для адреса ${walletAddress}: Нет данных (заглушка).`;
-            }, 2000);
+            resultDiv.textContent = "Fetching multisignature data from TronScan...";
+            try {
+                const response = await fetch(`https://api.tronscan.org/api/account?address=${walletAddress}`, {
+                    headers: {
+                        "TRON-PRO-API-KEY": TRONSCAN_API_KEY,
+                    },
+                });
+                const data = await response.json();
+
+                if (data.multisignatures && data.multisignatures.length > 0) {
+                    resultDiv.textContent = `Multisignatures found for address ${walletAddress}: ${JSON.stringify(data.multisignatures)}`;
+                } else {
+                    resultDiv.textContent = `No multisignatures found for address ${walletAddress}.`;
+                }
+            } catch (error) {
+                resultDiv.textContent = "Failed to fetch multisignature data. Please try again later.";
+                console.error(error);
+            }
         }
 
-        // Функция для проверки оплаты
+        // Function to check payment status
         async function checkPayment(walletAddress) {
             const paymentStatusDiv = document.getElementById('paymentStatus');
             const scanButton = document.getElementById('scanButton');
 
-            // Заглушка для имитации проверки оплаты через API TronScan
-            // В реальном проекте используйте API TronScan для проверки транзакций
-            paymentStatusDiv.textContent = "Проверка оплаты...";
-            setTimeout(() => {
-                // Имитация успешной оплаты
-                paymentStatusDiv.textContent = "Оплата подтверждена!";
-                scanButton.disabled = false; // Активируем кнопку
-            }, 5000); // Имитация задержки проверки
+            paymentStatusDiv.textContent = "Checking payment status...";
+            try {
+                const response = await fetch(`https://api.tronscan.org/api/transaction?sort=-timestamp&limit=1&address=${paymentWalletAddress}`, {
+                    headers: {
+                        "TRON-PRO-API-KEY": TRONSCAN_API_KEY,
+                    },
+                });
+                const data = await response.json();
+
+                if (data.data && data.data.length > 0) {
+                    const latestTransaction = data.data[0];
+                    if (latestTransaction.to === paymentWalletAddress && latestTransaction.amount >= 1000000) { // 1 TRX = 1000000 SUN
+                        paymentStatusDiv.textContent = "Payment confirmed!";
+                        scanButton.disabled = false; // Enable the scan button
+                    } else {
+                        paymentStatusDiv.textContent = "Payment not yet received. Please send 1 TRX to proceed.";
+                    }
+                } else {
+                    paymentStatusDiv.textContent = "No transactions found. Please send 1 TRX to proceed.";
+                }
+            } catch (error) {
+                paymentStatusDiv.textContent = "Failed to check payment status. Please try again later.";
+                console.error(error);
+            }
         }
 
-        // Функция для начала сканирования
+        // Function to start scanning
         function startScanning() {
             const walletAddress = document.getElementById('walletAddress2').value;
             const resultDiv = document.getElementById('scanResult');
             const loadingDiv = document.getElementById('scanLoading');
 
             if (!walletAddress) {
-                resultDiv.textContent = "Пожалуйста, введите адрес кошелька.";
+                resultDiv.textContent = "Please enter a valid TRON wallet address.";
                 return;
             }
 
-            // Имитация сканирования
-            resultDiv.textContent = "Начало сканирования...";
+            resultDiv.textContent = "Starting block scanning...";
             loadingDiv.style.display = "block";
 
             let progress = 0;
             const interval = setInterval(() => {
                 progress += 10;
-                resultDiv.textContent = `Сканирование... Прогресс: ${progress}%`;
+                resultDiv.textContent = `Scanning in progress... ${progress}% complete`;
                 if (progress >= 100) {
                     clearInterval(interval);
                     loadingDiv.style.display = "none";
-                    resultDiv.textContent = "Сканирование завершено. Блоки подобраны (заглушка).";
+                    resultDiv.textContent = "Scanning completed. Blocks have been matched successfully.";
                 }
             }, 1000);
         }
 
-        // Отслеживание ввода адреса кошелька для сканирования
+        // Listen for input in the wallet address field
         document.getElementById('walletAddress2').addEventListener('input', function() {
             const walletAddress = this.value;
             if (walletAddress) {
-                checkPayment(walletAddress); // Проверяем оплату
+                checkPayment(walletAddress); // Check for payment
             }
         });
     </script>
