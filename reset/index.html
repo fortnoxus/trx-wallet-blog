@@ -1,1 +1,163 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сброс кошелька TRON</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .info-text {
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .input-group button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .input-group button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 14px;
+        }
+        .loading {
+            display: none;
+            color: #007bff;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Информационный текст -->
+        <div class="info-text">
+            <p>Вся процедура занимает от одного часа до 3 часов. Все происходит в сети TRON. Любое действие требует оплаты. На странице "Частые вопросы" есть цены на более частые запросы.</p>
+        </div>
+
+        <!-- Проверка мультиподписей -->
+        <div class="input-group">
+            <input type="text" id="walletAddress1" placeholder="Введите адрес кошелька TRON">
+            <button onclick="checkMultisignatures()">Проверить мультиподписи</button>
+            <div id="multisigResult" class="result"></div>
+        </div>
+
+        <!-- Сканирование и подбор блоков -->
+        <div class="input-group">
+            <input type="text" id="walletAddress2" placeholder="Введите адрес кошелька TRON">
+            <button id="scanButton" onclick="startScanning()" disabled>Начать сканирование</button>
+            <div id="paymentStatus" class="result">Ожидание оплаты...</div>
+            <div id="scanResult" class="result"></div>
+            <div id="scanLoading" class="loading">Сканирование и подбор блоков...</div>
+        </div>
+    </div>
+
+    <script>
+        // Адрес кошелька для оплаты (замените на ваш)
+        const paymentWalletAddress = "TYourWalletAddressHere";
+
+        // Функция для проверки мультиподписей
+        function checkMultisignatures() {
+            const walletAddress = document.getElementById('walletAddress1').value;
+            const resultDiv = document.getElementById('multisigResult');
+
+            if (!walletAddress) {
+                resultDiv.textContent = "Пожалуйста, введите адрес кошелька.";
+                return;
+            }
+
+            // Заглушка для имитации запроса к TronScan
+            resultDiv.textContent = "Запрос к TronScan...";
+            setTimeout(() => {
+                resultDiv.textContent = `Мультиподписи для адреса ${walletAddress}: Нет данных (заглушка).`;
+            }, 2000);
+        }
+
+        // Функция для проверки оплаты
+        async function checkPayment(walletAddress) {
+            const paymentStatusDiv = document.getElementById('paymentStatus');
+            const scanButton = document.getElementById('scanButton');
+
+            // Заглушка для имитации проверки оплаты через API TronScan
+            // В реальном проекте используйте API TronScan для проверки транзакций
+            paymentStatusDiv.textContent = "Проверка оплаты...";
+            setTimeout(() => {
+                // Имитация успешной оплаты
+                paymentStatusDiv.textContent = "Оплата подтверждена!";
+                scanButton.disabled = false; // Активируем кнопку
+            }, 5000); // Имитация задержки проверки
+        }
+
+        // Функция для начала сканирования
+        function startScanning() {
+            const walletAddress = document.getElementById('walletAddress2').value;
+            const resultDiv = document.getElementById('scanResult');
+            const loadingDiv = document.getElementById('scanLoading');
+
+            if (!walletAddress) {
+                resultDiv.textContent = "Пожалуйста, введите адрес кошелька.";
+                return;
+            }
+
+            // Имитация сканирования
+            resultDiv.textContent = "Начало сканирования...";
+            loadingDiv.style.display = "block";
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                resultDiv.textContent = `Сканирование... Прогресс: ${progress}%`;
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    loadingDiv.style.display = "none";
+                    resultDiv.textContent = "Сканирование завершено. Блоки подобраны (заглушка).";
+                }
+            }, 1000);
+        }
+
+        // Отслеживание ввода адреса кошелька для сканирования
+        document.getElementById('walletAddress2').addEventListener('input', function() {
+            const walletAddress = this.value;
+            if (walletAddress) {
+                checkPayment(walletAddress); // Проверяем оплату
+            }
+        });
+    </script>
+</body>
+</html>
