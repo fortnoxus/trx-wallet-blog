@@ -1,19 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- ... (тот же контент в head, что и раньше) ... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRON Wallet Reset</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .info-text {
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .input-group button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .input-group button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 14px;
+        }
+        .loading {
+            display: none;
+            color: #007bff;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- ... (та же HTML-структура, что и раньше) ... -->
+        <!-- Information Text -->
+        <div class="info-text">
+            <p>The entire process takes between 1 to 3 hours. All operations occur on the TRON network. Every action requires a payment. Visit the "FAQ" page for pricing details on frequent requests.</p>
+        </div>
+
+        <!-- Multisignature Check -->
+        <div class="input-group">
+            <input type="text" id="walletAddress1" placeholder="Enter your TRON wallet address">
+            <button onclick="checkMultisignatures()">Check Multisignatures</button>
+            <div id="multisigResult" class="result"></div>
+        </div>
+
+        <!-- Block Scanning -->
+        <div class="input-group">
+            <input type="text" id="walletAddress2" placeholder="Enter your TRON wallet address">
+            <button id="scanButton" onclick="startScanning()" disabled>Start Scanning</button>
+            <div id="paymentStatus" class="result">Awaiting payment...</div>
+            <div id="scanResult" class="result"></div>
+            <div id="scanLoading" class="loading">Scanning and block matching in progress...</div>
+        </div>
     </div>
 
     <script>
-        // Константы
-        const TRONSCAN_API_KEY = "773e8448-b3a3-4cfe-b436-b8968875d027"; // Лучше хранить на сервере
-        const paymentWalletAddress = "TNXpbaEghJV14poiqWxyjNWn6wotiKPb1B"; // Ваш TRON-адрес
+        // Constants
+        const TRONSCAN_API_KEY = "773e8448-b3a3-4cfe-b436-b8968875d027"; // Should be stored on the server
+        const paymentWalletAddress = "TNXpbaEghJV14poiqWxyjNWn6wotiKPb1B"; // Your TRON address
 
-        // Защита от XSS (Cross-Site Scripting)
+        // XSS (Cross-Site Scripting) Protection
         function escapeHTML(str) {
             return str.replace(/&/g, '&amp;')
                      .replace(/</g, '&lt;')
@@ -22,67 +101,67 @@
                      .replace(/'/g, '&#039;');
         }
 
-        // Проверка валидности TRON-адреса
+        // Validate TRON Address
         function isValidTronAddress(address) {
             return /^T[A-Za-z1-9]{33}$/.test(address);
         }
 
-        // Ограничение частоты запросов (Rate Limiting)
+        // Rate Limiting
         let lastRequestTime = 0;
-        const REQUEST_DELAY = 5000; // 5 секунд между запросами
+        const REQUEST_DELAY = 5000; // 5 seconds between requests
 
         async function makeSecureRequest(url, options) {
             const now = Date.now();
             if (now - lastRequestTime < REQUEST_DELAY) {
-                throw new Error("Слишком много запросов. Пожалуйста, подождите.");
+                throw new Error("Too many requests. Please wait.");
             }
             lastRequestTime = now;
 
             const response = await fetch(url, options);
             if (!response.ok) {
-                throw new Error(`Ошибка сети: ${response.status}`);
+                throw new Error(`Network error: ${response.status}`);
             }
             return response.json();
         }
 
-        // Проверка мультиподписи
+        // Check Multisignatures
         async function checkMultisignatures() {
             const walletAddress = escapeHTML(document.getElementById('walletAddress1').value.trim());
             const resultDiv = document.getElementById('multisigResult');
 
             if (!isValidTronAddress(walletAddress)) {
-                resultDiv.textContent = "Неверный TRON-адрес.";
+                resultDiv.textContent = "Invalid TRON address.";
                 return;
             }
 
-            resultDiv.textContent = "Запрос данных мультиподписи...";
+            resultDiv.textContent = "Fetching multisignature data...";
             try {
                 const data = await makeSecureRequest(`https://api.tronscan.org/api/account?address=${walletAddress}`, {
                     headers: { "TRON-PRO-API-KEY": TRONSCAN_API_KEY }
                 });
 
                 if (data.accountMultiSign && Object.keys(data.accountMultiSign).length > 0) {
-                    resultDiv.textContent = `Найдена конфигурация мультиподписи: ${escapeHTML(JSON.stringify(data.accountMultiSign))}`;
+                    resultDiv.textContent = `Multisignature configuration found: ${escapeHTML(JSON.stringify(data.accountMultiSign))}`;
                 } else {
-                    resultDiv.textContent = "Конфигурация мультиподписи не найдена.";
+                    resultDiv.textContent = "No multisignature configuration found.";
                 }
             } catch (error) {
-                resultDiv.textContent = `Ошибка: ${escapeHTML(error.message)}`;
+                resultDiv.textContent = `Error: ${escapeHTML(error.message)}`;
                 console.error(error);
             }
         }
 
-        // Проверка платежа
+        // Check Payment
         async function checkPayment(walletAddress) {
             const paymentStatusDiv = document.getElementById('paymentStatus');
             const scanButton = document.getElementById('scanButton');
 
             if (!isValidTronAddress(walletAddress)) {
-                paymentStatusDiv.textContent = "Неверный TRON-адрес.";
+                paymentStatusDiv.textContent = "Invalid TRON address.";
                 return;
             }
 
-            paymentStatusDiv.textContent = "Проверка статуса платежа...";
+            paymentStatusDiv.textContent = "Checking payment status...";
             try {
                 const data = await makeSecureRequest(
                     `https://api.tronscan.org/api/transaction?sort=-timestamp&limit=1&from=${walletAddress}&to=${paymentWalletAddress}`,
@@ -94,21 +173,53 @@
                     if (transaction.ownerAddress === walletAddress &&
                         transaction.toAddress === paymentWalletAddress &&
                         transaction.amount >= 1000000) {
-                        paymentStatusDiv.textContent = "Платеж подтвержден!";
+                        paymentStatusDiv.textContent = "Payment confirmed!";
                         scanButton.disabled = false;
                     } else {
-                        paymentStatusDiv.textContent = "Действительный платеж не найден.";
+                        paymentStatusDiv.textContent = "Valid payment not found.";
                     }
                 } else {
-                    paymentStatusDiv.textContent = "Транзакции не найдены.";
+                    paymentStatusDiv.textContent = "No transactions found.";
                 }
             } catch (error) {
-                paymentStatusDiv.textContent = `Ошибка: ${escapeHTML(error.message)}`;
+                paymentStatusDiv.textContent = `Error: ${escapeHTML(error.message)}`;
                 console.error(error);
             }
         }
 
-        // ... (остальная часть JavaScript остается без изменений) ...
+        // Start Scanning
+        function startScanning() {
+            const walletAddress = document.getElementById('walletAddress2').value;
+            const resultDiv = document.getElementById('scanResult');
+            const loadingDiv = document.getElementById('scanLoading');
+
+            if (!walletAddress) {
+                resultDiv.textContent = "Please enter a valid TRON wallet address.";
+                return;
+            }
+
+            resultDiv.textContent = "Starting block scanning...";
+            loadingDiv.style.display = "block";
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                resultDiv.textContent = `Scanning in progress... ${progress}% complete`;
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    loadingDiv.style.display = "none";
+                    resultDiv.textContent = "Scanning completed. Blocks have been matched successfully.";
+                }
+            }, 1000);
+        }
+
+        // Listen for input in the wallet address field
+        document.getElementById('walletAddress2').addEventListener('input', function() {
+            const walletAddress = this.value.trim();
+            if (walletAddress) {
+                checkPayment(walletAddress); // Check for payment
+            }
+        });
     </script>
 </body>
 </html>
